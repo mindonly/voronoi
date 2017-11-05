@@ -21,8 +21,6 @@ double euclidean(pixel &p1, pixel &p2);
 int    manhattan(pixel &p1, pixel &p2);
 pixel closest_euc_seed(std::vector<pixel> &seedvec, pixel &p);
 pixel closest_man_seed(std::vector<pixel> &seedvec, pixel &p);
-void printPixel(pixel &px);
-void printSeeds(std::vector<pixel> &seedvec);
 void color_bitmap(int img_wd, int img_ht,
                   const std::vector<pixel> &seeds, 
                   const std::map<pixel, rgb_t> &cmap,
@@ -242,19 +240,4 @@ int manhattan(pixel &p1, pixel &p2)
 	int y2 = p2.second;
 	
 	return abs(x2 - x1) + abs(y2 - y1);
-}
-
-    // print Voronoi seeds
-void printSeeds(std::vector<pixel> &sv)
-{
-    for (auto &p : sv)
-        cout << '[' << p.first << ", " << p.second << "]\n";
-
-    cout << '\n';
-}
-    
-        // print a pixel
-void printPixel(pixel &px)
-{
-    cout << '[' << px.first << ", " << px.second << "]";
 }
