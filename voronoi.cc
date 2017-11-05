@@ -1,6 +1,16 @@
+/*
+ * Rob Sanchez
+ * GPU-Accelerated Determination of the Voronoi Diagram
+ * Programming Assignment #3
+ * CIS 677, F2017
+ * Wolffe
+ */
+
 #include <algorithm>
 #include <iostream>
 #include <cstdlib>
+#include <fstream>
+#include <iomanip>
 #include <chrono>
 #include <random>
 #include <cmath>
@@ -13,14 +23,11 @@
 using std::cout;
 using std::cerr;
 
-
 typedef std::pair<int, int> pixel;
 
 std::vector<pixel> generateSeeds(int nseeds, int wd, int ht);
 double euclidean(pixel &p1, pixel &p2);
 int    manhattan(pixel &p1, pixel &p2);
-pixel closest_euc_seed(std::vector<pixel> &seedvec, pixel &p);
-pixel closest_man_seed(std::vector<pixel> &seedvec, pixel &p);
 void color_bitmap(int img_wd, int img_ht,
                   const std::vector<pixel> &seeds, 
                   const std::map<pixel, rgb_t> &cmap,
@@ -171,13 +178,29 @@ int main(int argc, char* argv[])
 
         // record the image coloring and writing time
     double color_write_time = tmr.elapsed();
+    double total_runtime = setup_time + trans_time + color_write_time;
 
-        // timings
+        // timing output
     cout << "      SEEDS: " << num_seeds << '\n';
-    cout << " DIMENSIONS: " << IMG_WIDTH << 'x' << IMG_HEIGHT <<'\n';
+    cout << " DIMENSIONS: " << IMG_WIDTH << 'x' << IMG_HEIGHT << '\n';
+    cout << "     PIXELS: " << IMG_WIDTH * IMG_HEIGHT << '\n';
     cout << "        setup time: " << setup_time       * 1000 << " ms \n";
     cout << "    transform time: " << trans_time       * 1000 << " ms \n";
     cout << "color & write time: " << color_write_time * 1000 << " ms \n";
+    cout << "     total runtime: " << total_runtime    * 1000 << " ms \n";
+
+        // write results to a file
+    std::string const ofname("results.out");
+    std::ofstream outfile;
+    outfile.open(ofname, std::ios_base::app);
+    outfile << num_seeds << '\t' 
+            << IMG_WIDTH << 'x' << IMG_HEIGHT << '\t' 
+            << IMG_WIDTH * IMG_HEIGHT << '\t' 
+            << total_runtime * 1000 << '\t' << '\t'
+            << setup_time * 1000 << '\t' 
+            << trans_time * 1000 << '\t' 
+            << color_write_time * 1000 << '\n';
+    outfile.close();
 
     return 0;
 }
