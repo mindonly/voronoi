@@ -10,7 +10,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
-#include <iomanip>
 #include <chrono>
 #include <random>
 #include <cmath>
@@ -154,21 +153,24 @@ int main(int argc, char* argv[])
     double setup_time = tmr.elapsed();
     
         // reset the timer
+        // apply Euclidean distance functor with transform() to seeds matrix and pixel vector
+        // record the Euclidean transformation time
     tmr.reset();
-
-        // apply distance functors with transform() to seeds matrix and pixel vector
     std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
                    closest_euclidean_seeds.begin(), ClosestEuclideanSeed());
-    std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
-                   closest_manhattan_seeds.begin(), ClosestManhattanSeed());
-
-        // record the transformation time
-    double trans_time = tmr.elapsed();
+    double euc_trans_time = tmr.elapsed();
 
         // reset the timer
+        // apply Manhattan distance functor with transform() to seeds matrix and pixel vector
+        // record the Manhattan transformation time
     tmr.reset();
+    std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
+                   closest_manhattan_seeds.begin(), ClosestManhattanSeed());
+    double man_trans_time = tmr.elapsed();
 
+        // reset the timer
         // color the target bitmaps (Euclidean & Manhattan)
+    tmr.reset();
     color_bitmap(IMG_WIDTH, IMG_HEIGHT, closest_euclidean_seeds, color_map, voronoi_euclidean);
     color_bitmap(IMG_WIDTH, IMG_HEIGHT, closest_manhattan_seeds, color_map, voronoi_manhattan);
 
@@ -176,18 +178,19 @@ int main(int argc, char* argv[])
     voronoi_euclidean.save_image("voronoi_euclidean.bmp");
     voronoi_manhattan.save_image("voronoi_manhattan.bmp");
 
-        // record the image coloring and writing time
+        // record the image coloring, writing, and total runtimes
     double color_write_time = tmr.elapsed();
-    double total_runtime = setup_time + trans_time + color_write_time;
+    double total_runtime = setup_time + euc_trans_time + man_trans_time + color_write_time;
 
         // timing output
     cout << "      SEEDS: " << num_seeds << '\n';
     cout << " DIMENSIONS: " << IMG_WIDTH << 'x' << IMG_HEIGHT << '\n';
     cout << "     PIXELS: " << IMG_WIDTH * IMG_HEIGHT << '\n';
-    cout << "        setup time: " << setup_time       * 1000 << " ms \n";
-    cout << "    transform time: " << trans_time       * 1000 << " ms \n";
-    cout << "color & write time: " << color_write_time * 1000 << " ms \n";
-    cout << "     total runtime: " << total_runtime    * 1000 << " ms \n";
+    cout << "         setup time: " << setup_time       * 1000 << " ms \n";
+    cout << "Euc. transform time: " << euc_trans_time   * 1000 << " ms \n";
+    cout << "Man. transform time: " << man_trans_time   * 1000 << " ms \n";
+    cout << " color & write time: " << color_write_time * 1000 << " ms \n";
+    cout << "      total runtime: " << total_runtime    * 1000 << " ms \n";
 
         // write results to a file
     std::string const ofname("results.out");
@@ -198,7 +201,8 @@ int main(int argc, char* argv[])
             << IMG_WIDTH * IMG_HEIGHT << '\t' 
             << total_runtime * 1000 << '\t' << '\t'
             << setup_time * 1000 << '\t' 
-            << trans_time * 1000 << '\t' 
+            << euc_trans_time * 1000 << '\t' 
+            << man_trans_time * 1000 << '\t' 
             << color_write_time * 1000 << '\n';
     outfile.close();
 
