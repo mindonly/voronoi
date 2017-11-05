@@ -104,6 +104,9 @@ int main(int argc, char* argv[])
     int IMG_WIDTH  = atoi(argv[2]);
     int IMG_HEIGHT = atoi(argv[3]);
 
+        // instantiate the timer
+    Timer tmr;
+
         // create Euclidean and Manhattan bitmaps
     bitmap_image voronoi_euclidean(IMG_WIDTH, IMG_HEIGHT);
     bitmap_image voronoi_manhattan(IMG_WIDTH, IMG_HEIGHT);
@@ -142,9 +145,23 @@ int main(int argc, char* argv[])
     std::vector<pixel> closest_euclidean_seeds(IMG_WIDTH * IMG_HEIGHT);
     std::vector<pixel> closest_manhattan_seeds(IMG_WIDTH * IMG_HEIGHT);
 
+        // record the setup time
+    double setup_time = tmr.elapsed();
+    
+        // reset the timer
+    tmr.reset();
+
         // apply distance functors with transform() to seeds matrix and pixel vector
-    std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), closest_euclidean_seeds.begin(), ClosestEuclideanSeed());
-    std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), closest_manhattan_seeds.begin(), ClosestManhattanSeed());
+    std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
+                   closest_euclidean_seeds.begin(), ClosestEuclideanSeed());
+    std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
+                   closest_manhattan_seeds.begin(), ClosestManhattanSeed());
+
+        // record the transformation time
+    double trans_time = tmr.elapsed();
+
+        // reset the timer
+    tmr.reset();
 
         // color the target bitmaps (Euclidean & Manhattan)
     color_bitmap(IMG_WIDTH, IMG_HEIGHT, closest_euclidean_seeds, color_map, voronoi_euclidean);
@@ -153,6 +170,16 @@ int main(int argc, char* argv[])
         // write the Euclidean and Manhattan bitmaps
     voronoi_euclidean.save_image("voronoi_euclidean.bmp");
     voronoi_manhattan.save_image("voronoi_manhattan.bmp");
+
+        // record the image coloring and writing time
+    double color_write_time = tmr.elapsed();
+
+        // timings
+    cout << "      SEEDS: " << num_seeds << '\n';
+    cout << " DIMENSIONS: " << IMG_WIDTH << 'x' << IMG_HEIGHT <<'\n';
+    cout << "        setup time: " << setup_time       * 1000 << " ms \n";
+    cout << "    transform time: " << trans_time       * 1000 << " ms \n";
+    cout << "color & write time: " << color_write_time * 1000 << " ms \n";
 
     return 0;
 }
