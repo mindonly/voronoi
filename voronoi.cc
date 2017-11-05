@@ -152,17 +152,21 @@ int main(int argc, char* argv[])
         // record the setup time
     double setup_time = tmr.elapsed();
     
-        // reset the timer
-        // apply Euclidean distance functor with transform() to seeds matrix and pixel vector
-        // record the Euclidean transformation time
+        /* 
+         * reset the timer
+         * apply Euclidean distance functor with transform() to seeds matrix and pixel vector
+         * record the Euclidean transformation time
+         */ 
     tmr.reset();
     std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
                    closest_euclidean_seeds.begin(), ClosestEuclideanSeed());
     double euc_trans_time = tmr.elapsed();
 
-        // reset the timer
-        // apply Manhattan distance functor with transform() to seeds matrix and pixel vector
-        // record the Manhattan transformation time
+        /*
+         * reset the timer
+         * apply Manhattan distance functor with transform() to seeds matrix and pixel vector
+         * record the Manhattan transformation time
+         */
     tmr.reset();
     std::transform(seeds_matrix.begin(), seeds_matrix.end(), img_pixels.begin(), 
                    closest_manhattan_seeds.begin(), ClosestManhattanSeed());
