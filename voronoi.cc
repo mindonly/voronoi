@@ -4,6 +4,8 @@
  * Programming Assignment #3
  * CIS 677, F2017
  * Wolffe
+ *
+ * Standard C++14 version.
  */
 
 #include <algorithm>
